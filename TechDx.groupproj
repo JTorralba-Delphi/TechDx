@@ -1,0 +1,36 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{83071425-5E0B-423D-8A0C-BBD6D42C532D}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="TechDx.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="TechDx">
+        <MSBuild Projects="TechDx.dproj"/>
+    </Target>
+    <Target Name="TechDx:Clean">
+        <MSBuild Projects="TechDx.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="TechDx:Make">
+        <MSBuild Projects="TechDx.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="TechDx"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="TechDx:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="TechDx:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
