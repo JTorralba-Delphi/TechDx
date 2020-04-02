@@ -57,6 +57,55 @@ object TabForm: TTabForm
       Text = 'Client'
       ExplicitSize.cx = 50.000000000000000000
       ExplicitSize.cy = 49.000000000000000000
+      object Button_Client_Host: TButton
+        Enabled = False
+        Position.X = 8.000000000000000000
+        Position.Y = 10.000000000000000000
+        TabOrder = 0
+        Text = 'Host'
+      end
+      object Edit_Client_Host: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 1
+        Position.X = 96.000000000000000000
+        Position.Y = 10.000000000000000000
+        Size.Width = 280.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object ListBox_Client: TListBox
+        Enabled = False
+        Position.X = 8.000000000000000000
+        Position.Y = 40.000000000000000000
+        Size.Width = 368.000000000000000000
+        Size.Height = 392.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        DisableFocusEffect = True
+        DefaultItemStyles.ItemStyle = ''
+        DefaultItemStyles.GroupHeaderStyle = ''
+        DefaultItemStyles.GroupFooterStyle = ''
+        Viewport.Width = 364.000000000000000000
+        Viewport.Height = 388.000000000000000000
+      end
+      object Edit_Send: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 3
+        Position.X = 8.000000000000000000
+        Position.Y = 440.000000000000000000
+        Size.Width = 280.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object Button_Send: TButton
+        Position.X = 296.000000000000000000
+        Position.Y = 440.000000000000000000
+        Size.Width = 80.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 4
+        Text = 'Send'
+      end
     end
     object TabItem_Server: TTabItem
       CustomIcon = <

@@ -5,7 +5,9 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.TabControl,
-  FMX.StdCtrls, FMX.Gestures, FMX.Controls.Presentation;
+  FMX.StdCtrls, FMX.Gestures, FMX.Controls.Presentation, FMX.ListView.Types,
+  FMX.ListView.Appearances, FMX.ListView.Adapters.Base, FMX.ListView, FMX.Edit,
+  FMX.Layouts, FMX.ListBox;
 
 type
   TTabForm = class(TForm)
@@ -13,7 +15,14 @@ type
     HeaderToolBar: TToolBar;
     ToolBarLabel: TLabel;
     TabControl: TTabControl;
+
     TabItem_Client: TTabItem;
+    Button_Client_Host: TButton;
+    Edit_Client_Host: TEdit;
+    ListBox_Client: TListBox;
+    Edit_Send: TEdit;
+    Button_Send: TButton;
+
     TabItem_Server: TTabItem;
     TabItem_ANIALI: TTabItem;
     TabItem_ProQA: TTabItem;
