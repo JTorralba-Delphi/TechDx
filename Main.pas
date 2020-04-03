@@ -10,18 +10,18 @@ uses
   FMX.Layouts, FMX.ListBox;
 
 type
-  TTabForm = class(TForm)
-    GestureManager: TGestureManager;
-    HeaderToolBar: TToolBar;
-    ToolBarLabel: TLabel;
-    TabControl: TTabControl;
+  TTabForm_Main = class(TForm)
+    GestureManager_Main: TGestureManager;
+    ToolBar_Main: TToolBar;
+    Label_Main: TLabel;
+    TabControl_Main: TTabControl;
 
     TabItem_Client: TTabItem;
     Button_Client_Host: TButton;
     Edit_Client_Host: TEdit;
     ListBox_Client: TListBox;
-    Edit_Send: TEdit;
-    Button_Send: TButton;
+    Edit_Client_Send: TEdit;
+    Button_Client_Send: TButton;
 
     TabItem_Server: TTabItem;
     TabItem_ANIALI: TTabItem;
@@ -31,39 +31,36 @@ type
     procedure FormGesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
 
   private
-
   public
+end;
 
-  end;
-
-var
-  TabForm: TTabForm;
+var TabForm_Main: TTabForm_Main;
 
 implementation
 
 {$R *.fmx}
 
-procedure TTabForm.FormCreate(Sender: TObject);
+procedure TTabForm_Main.FormCreate(Sender: TObject);
 begin
   Application.Title := 'Technician Diagnostics';
-  TabControl.ActiveTab := TabItem_Client;
+  TabControl_Main.ActiveTab := TabItem_Client;
 end;
 
-procedure TTabForm.FormGesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
+procedure TTabForm_Main.FormGesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
 begin
 {$IFDEF ANDROID}
   case EventInfo.GestureID of
     sgiLeft:
     begin
-      if TabControl1.ActiveTab <> TabControl1.Tabs[TabControl1.TabCount-1] then
-        TabControl1.ActiveTab := TabControl1.Tabs[TabControl1.TabIndex+1];
+      if TabControl_Main.ActiveTab <> TabControl_Main.Tabs[TabControl_Main.TabCount-1] then
+        TabControl_Main.ActiveTab := TabControl_Main.Tabs[TabControl_Main.TabIndex+1];
       Handled := True;
     end;
 
     sgiRight:
     begin
-      if TabControl1.ActiveTab <> TabControl1.Tabs[0] then
-        TabControl1.ActiveTab := TabControl1.Tabs[TabControl1.TabIndex-1];
+      if TabControl_Main.ActiveTab <> TabControl_Main.Tabs[0] then
+        TabControl_Main.ActiveTab := TabControl_Main.Tabs[TabControl_Main.TabIndex-1];
       Handled := True;
     end;
   end;

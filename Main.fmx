@@ -1,4 +1,4 @@
-object TabForm: TTabForm
+object TabForm_Main: TTabForm_Main
   Left = 0
   Top = 0
   Caption = 'Technician Diagnostics'
@@ -9,13 +9,13 @@ object TabForm: TTabForm
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
   DesignerMasterStyle = 0
-  object HeaderToolBar: TToolBar
+  object ToolBar_Main: TToolBar
     Anchors = []
     Size.Width = 384.000000000000000000
     Size.Height = 48.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
-    object ToolBarLabel: TLabel
+    object Label_Main: TLabel
       Align = Contents
       Size.Width = 384.000000000000000000
       Size.Height = 48.000000000000000000
@@ -25,7 +25,7 @@ object TabForm: TTabForm
       Text = 'TechDx'
     end
   end
-  object TabControl: TTabControl
+  object TabControl_Main: TTabControl
     Align = Client
     FullSize = True
     Size.Width = 384.000000000000000000
@@ -88,7 +88,7 @@ object TabForm: TTabForm
         Viewport.Width = 364.000000000000000000
         Viewport.Height = 388.000000000000000000
       end
-      object Edit_Send: TEdit
+      object Edit_Client_Send: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         TabOrder = 3
         Position.X = 8.000000000000000000
@@ -97,7 +97,7 @@ object TabForm: TTabForm
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
       end
-      object Button_Send: TButton
+      object Button_Client_Send: TButton
         Position.X = 296.000000000000000000
         Position.Y = 440.000000000000000000
         Size.Width = 80.000000000000000000
@@ -150,7 +150,7 @@ object TabForm: TTabForm
       ExplicitSize.cy = 49.000000000000000000
     end
   end
-  object GestureManager: TGestureManager
+  object GestureManager_Main: TGestureManager
     Sensitivity = 80.000000000000000000
     Left = 176
     Top = 288

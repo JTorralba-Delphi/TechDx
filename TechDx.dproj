@@ -449,7 +449,7 @@
         </DelphiCompile>
         <DCCReference Include="Main.pas">
             <FormDeviceName>iPhone</FormDeviceName>
-            <Form>TabForm</Form>
+            <Form>TabForm_Main</Form>
             <FormType>fmx</FormType>
         </DCCReference>
         <BuildConfiguration Include="Release">
