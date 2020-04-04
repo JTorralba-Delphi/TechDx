@@ -31,7 +31,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormGesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
 
-    procedure Button_Client_Send_OnClick(Sender: TObject);
+    procedure Style_Test(Sender: TObject);
 
   private
   public
@@ -70,7 +70,7 @@ begin
 {$ENDIF}
 end;
 
-procedure TTabForm_Main.Button_Client_Send_OnClick(Sender: TObject);
+procedure TTabForm_Main.Style_Test(Sender: TObject);
 var
   LBItem: TListBoxItem;
 begin

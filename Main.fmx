@@ -105,7 +105,7 @@ object TabForm_Main: TTabForm_Main
         Size.PlatformDefault = False
         TabOrder = 4
         Text = 'Send'
-        OnClick = Button_Client_Send_OnClick
+        OnClick = Style_Test
       end
     end
     object TabItem_Server: TTabItem
