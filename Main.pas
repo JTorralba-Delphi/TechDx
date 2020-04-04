@@ -26,9 +26,12 @@ type
     TabItem_Server: TTabItem;
     TabItem_ANIALI: TTabItem;
     TabItem_ProQA: TTabItem;
+    StyleBook_Main: TStyleBook;
 
     procedure FormCreate(Sender: TObject);
     procedure FormGesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
+
+    procedure Button_Client_Send_OnClick(Sender: TObject);
 
   private
   public
@@ -65,6 +68,35 @@ begin
     end;
   end;
 {$ENDIF}
+end;
+
+procedure TTabForm_Main.Button_Client_Send_OnClick(Sender: TObject);
+var
+  LBItem: TListBoxItem;
+begin
+  LBItem := TListBoxItem.Create(ListBox_Client);
+  LBItem.Parent := ListBox_Client;
+  LBItem.StyleLookup := 'Default';
+  LBItem.StylesData['Data'] := 'Test';
+  ListBox_Client.AddObject(LBItem);
+
+  LBItem := TListBoxItem.Create(ListBox_Client);
+  LBItem.Parent := ListBox_Client;
+  LBItem.StyleLookup := 'Error';
+  LBItem.StylesData['Data'] := 'Test';
+  ListBox_Client.AddObject(LBItem);
+
+  LBItem := TListBoxItem.Create(ListBox_Client);
+  LBItem.Parent := ListBox_Client;
+  LBItem.StyleLookup := 'TX';
+  LBItem.StylesData['Data'] := 'Test';
+  ListBox_Client.AddObject(LBItem);
+
+  LBItem := TListBoxItem.Create(ListBox_Client);
+  LBItem.Parent := ListBox_Client;
+  LBItem.StyleLookup := 'RX';
+  LBItem.StylesData['Data'] := 'Test';
+  ListBox_Client.AddObject(LBItem);
 end;
 
 end.
