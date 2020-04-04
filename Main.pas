@@ -78,25 +78,25 @@ begin
   LBItem := TListBoxItem.Create(ListBox_Client);
   LBItem.Parent := ListBox_Client;
   LBItem.StyleLookup := 'Default';
-  LBItem.StylesData['Data'] := 'Test';
+  LBItem.StylesData['Message'] := 'Default';
   ListBox_Client.AddObject(LBItem);
 
   LBItem := TListBoxItem.Create(ListBox_Client);
   LBItem.Parent := ListBox_Client;
   LBItem.StyleLookup := 'Error';
-  LBItem.StylesData['Data'] := 'Test';
+  LBItem.StylesData['Message'] := 'Error';
   ListBox_Client.AddObject(LBItem);
 
   LBItem := TListBoxItem.Create(ListBox_Client);
   LBItem.Parent := ListBox_Client;
   LBItem.StyleLookup := 'TX';
-  LBItem.StylesData['Data'] := 'Test';
+  LBItem.StylesData['Message'] := 'TX';
   ListBox_Client.AddObject(LBItem);
 
   LBItem := TListBoxItem.Create(ListBox_Client);
   LBItem.Parent := ListBox_Client;
   LBItem.StyleLookup := 'RX';
-  LBItem.StylesData['Data'] := 'Test';
+  LBItem.StylesData['Message'] := 'RX';
   ListBox_Client.AddObject(LBItem);
 end;
 
