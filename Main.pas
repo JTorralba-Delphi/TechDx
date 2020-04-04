@@ -17,8 +17,8 @@ type
     TabControl_Main: TTabControl;
 
     TabItem_Client: TTabItem;
-    Button_Client_Host: TButton;
-    Edit_Client_Host_IP: TEdit;
+    Button_Client_Remote: TButton;
+    Edit_Client_Remote_IP: TEdit;
     ListBox_Client: TListBox;
     Edit_Client_Message: TEdit;
     Button_Client_Send: TButton;
@@ -27,7 +27,7 @@ type
     TabItem_ANIALI: TTabItem;
     TabItem_ProQA: TTabItem;
     StyleBook_Main: TStyleBook;
-    Edit_Client_Host_Port: TEdit;
+    Edit_Client_Remote_Port: TEdit;
 
     procedure FormCreate(Sender: TObject);
     procedure FormGesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);

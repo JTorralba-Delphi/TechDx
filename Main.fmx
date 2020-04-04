@@ -58,15 +58,15 @@ object TabForm_Main: TTabForm_Main
       Text = 'Client'
       ExplicitSize.cx = 50.000000000000000000
       ExplicitSize.cy = 49.000000000000000000
-      object Button_Client_Host: TButton
+      object Button_Client_Remote: TButton
         Enabled = False
         Position.X = 8.000000000000000000
         Position.Y = 10.000000000000000000
         TabOrder = 0
         TabStop = False
-        Text = 'Host'
+        Text = 'Remote'
       end
-      object Edit_Client_Host_IP: TEdit
+      object Edit_Client_Remote_IP: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         TabOrder = 1
         Position.X = 96.000000000000000000
@@ -111,7 +111,7 @@ object TabForm_Main: TTabForm_Main
         Text = 'Send'
         OnClick = Style_Test
       end
-      object Edit_Client_Host_Port: TEdit
+      object Edit_Client_Remote_Port: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         TabOrder = 2
         Position.X = 296.000000000000000000
