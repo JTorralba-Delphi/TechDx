@@ -63,16 +63,18 @@ object TabForm_Main: TTabForm_Main
         Position.X = 8.000000000000000000
         Position.Y = 10.000000000000000000
         TabOrder = 0
+        TabStop = False
         Text = 'Host'
       end
-      object Edit_Client_Host: TEdit
+      object Edit_Client_Host_IP: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         TabOrder = 1
         Position.X = 96.000000000000000000
         Position.Y = 10.000000000000000000
-        Size.Width = 280.000000000000000000
+        Size.Width = 192.000000000000000000
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
+        TextPrompt = 'IP'
       end
       object ListBox_Client: TListBox
         Position.X = 8.000000000000000000
@@ -80,7 +82,8 @@ object TabForm_Main: TTabForm_Main
         Size.Width = 368.000000000000000000
         Size.Height = 392.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 2
+        TabOrder = 3
+        TabStop = False
         DisableFocusEffect = True
         DefaultItemStyles.ItemStyle = ''
         DefaultItemStyles.GroupHeaderStyle = ''
@@ -88,14 +91,15 @@ object TabForm_Main: TTabForm_Main
         Viewport.Width = 364.000000000000000000
         Viewport.Height = 388.000000000000000000
       end
-      object Edit_Client_Send: TEdit
+      object Edit_Client_Message: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
-        TabOrder = 3
+        TabOrder = 4
         Position.X = 8.000000000000000000
         Position.Y = 440.000000000000000000
         Size.Width = 280.000000000000000000
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
+        TextPrompt = 'Message'
       end
       object Button_Client_Send: TButton
         Position.X = 296.000000000000000000
@@ -103,9 +107,19 @@ object TabForm_Main: TTabForm_Main
         Size.Width = 80.000000000000000000
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 4
+        TabOrder = 5
         Text = 'Send'
         OnClick = Style_Test
+      end
+      object Edit_Client_Host_Port: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 2
+        Position.X = 296.000000000000000000
+        Position.Y = 10.000000000000000000
+        Size.Width = 80.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TextPrompt = 'Port'
       end
     end
     object TabItem_Server: TTabItem

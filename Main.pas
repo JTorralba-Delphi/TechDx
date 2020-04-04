@@ -18,15 +18,16 @@ type
 
     TabItem_Client: TTabItem;
     Button_Client_Host: TButton;
-    Edit_Client_Host: TEdit;
+    Edit_Client_Host_IP: TEdit;
     ListBox_Client: TListBox;
-    Edit_Client_Send: TEdit;
+    Edit_Client_Message: TEdit;
     Button_Client_Send: TButton;
 
     TabItem_Server: TTabItem;
     TabItem_ANIALI: TTabItem;
     TabItem_ProQA: TTabItem;
     StyleBook_Main: TStyleBook;
+    Edit_Client_Host_Port: TEdit;
 
     procedure FormCreate(Sender: TObject);
     procedure FormGesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
