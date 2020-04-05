@@ -81,6 +81,7 @@ object TabForm_Main: TTabForm_Main
       end
       object Button_Client_Send: TButton
         Anchors = [akRight, akBottom]
+        Enabled = False
         Position.X = 296.000000000000000000
         Position.Y = 440.000000000000000000
         Size.Width = 80.000000000000000000

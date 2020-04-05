@@ -101,7 +101,6 @@ end;
 
 procedure TTabForm_Main.Button_Client_Connect_OnClick(Sender: TObject);
 begin
-
   Client_Connected := not Client_Connected;
   if (Client_Connected)
   then
@@ -115,7 +114,7 @@ begin
         Button_Client_Connect.Text := 'Disconnect';
       except
         Client_Connected := False;
-        ShowMessage('Connect failed.');
+        Client_Log('ST', 'Connect failed.');
       end;
     end
   else
@@ -128,7 +127,6 @@ begin
         Button_Client_Connect.Text := 'Connect';
       end
     end
-
 end;
 
 procedure TTabForm_Main.Client_Log(Message_Type: String; Message: String);
@@ -143,16 +141,15 @@ end;
 
 procedure TTabForm_Main.Button_Client_Send_OnClick(Sender: TObject);
 begin
-
   try
     TCPClient_Main.Socket.WriteLn(Memo_Client_Message.Text);
     Client_Log('TX', Memo_Client_Message.Text);
     Memo_Client_Message.Lines.Clear();
   except
     Button_Client_Connect_OnClick(Sender);
-    ShowMessage('Send failed.');
-  end
-
+    Client_Log('ST', 'Send failed.');
+  end;
+  Memo_Client_Message.SetFocus();
 end;
 
 end.
