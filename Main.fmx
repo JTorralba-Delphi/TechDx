@@ -137,6 +137,7 @@ object TabForm_Main: TTabForm_Main
         object Memo_Client_Console: TMemo
           Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
           DataDetectorTypes = []
+          ReadOnly = True
           Align = Client
           Margins.Bottom = 4.000000000000000000
           Size.Width = 368.000000000000000000

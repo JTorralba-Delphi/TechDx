@@ -24,6 +24,7 @@ type
     Edit_Client_Remote_IP: TEdit;
     Edit_Client_Remote_Port: TEdit;
     Button_Client_Connect: TButton;
+    GridPanelLayout_Client: TGridPanelLayout;
     Memo_Client_Console: TMemo;
     Memo_Client_Message: TMemo;
     Button_Client_Send: TButton;
@@ -31,16 +32,15 @@ type
     TabItem_Server: TTabItem;
     TabItem_ANIALI: TTabItem;
     TabItem_ProQA: TTabItem;
-    GridPanelLayout_Client: TGridPanelLayout;
+
+    function GetNow():String;
 
     procedure FormCreate(Sender: TObject);
     procedure FormGesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
 
-    procedure Style_Test(Sender: TObject);
-
     procedure Button_Client_Connect_OnClick(Sender: TObject);
 
-    Procedure ListBox_Client_Log(Sender: TObject; Message_Type: String; Message :String);
+    Procedure Client_Log(Message_Type: String; Message :String);
     procedure Button_Client_Send_OnClick(Sender: TObject);
     procedure TCPClient_Main_OnConnected(Sender: TObject);
     procedure TCPClient_Main_OnDisconnected(Sender: TObject);
@@ -55,6 +55,11 @@ var Client_Connected: Boolean;
 implementation
 
 {$R *.fmx}
+
+function TTabForm_Main.GetNow() : String;
+begin
+    result := FormatDateTime('yyyy-mm-dd hh:nn:ss', Now);
+end;
 
 procedure TTabForm_Main.FormCreate(Sender: TObject);
 begin
@@ -84,45 +89,14 @@ begin
 {$ENDIF}
 end;
 
-procedure TTabForm_Main.Style_Test(Sender: TObject);
-var
-  LBItem: TListBoxItem;
-begin
-{
-  LBItem := TListBoxItem.Create(ListBox_Client);
-  LBItem.Parent := ListBox_Client;
-  LBItem.StyleLookup := 'Default';
-  LBItem.StylesData['Message'] := 'Default';
-  ListBox_Client.AddObject(LBItem);
-
-  LBItem := TListBoxItem.Create(ListBox_Client);
-  LBItem.Parent := ListBox_Client;
-  LBItem.StyleLookup := 'Error';
-  LBItem.StylesData['Message'] := 'Error';
-  ListBox_Client.AddObject(LBItem);
-
-  LBItem := TListBoxItem.Create(ListBox_Client);
-  LBItem.Parent := ListBox_Client;
-  LBItem.StyleLookup := 'TX';
-  LBItem.StylesData['Message'] := 'TX';
-  ListBox_Client.AddObject(LBItem);
-
-  LBItem := TListBoxItem.Create(ListBox_Client);
-  LBItem.Parent := ListBox_Client;
-  LBItem.StyleLookup := 'RX';
-  LBItem.StylesData['Message'] := 'RX';
-  ListBox_Client.AddObject(LBItem);
-}
-end;
-
 procedure TTabForm_Main.TCPClient_Main_OnConnected(Sender: TObject);
 begin
-  ListBox_Client_Log(Sender, 'Default', 'Client connected to server.');
+  Client_Log('ST', 'Connected to server.');
 end;
 
 procedure TTabForm_Main.TCPClient_Main_OnDisconnected(Sender: TObject);
 begin
-  ListBox_Client_Log(Sender, 'Default', 'Client disconnected from server.');
+  Client_Log('ST', 'Disconnected from server.');
 end;
 
 procedure TTabForm_Main.Button_Client_Connect_OnClick(Sender: TObject);
@@ -157,17 +131,14 @@ begin
 
 end;
 
-procedure TTabForm_Main.ListBox_Client_Log(Sender: TObject; Message_Type: String; Message: String);
-var
-  Item: TListBoxItem;
+procedure TTabForm_Main.Client_Log(Message_Type: String; Message: String);
 begin
-{
-  Item := TListBoxItem.Create(ListBox_Client);
-  Item.Parent := ListBox_Client;
-  Item.StyleLookup := Message_Type;
-  Item.StylesData['Message'] := Message;
-  ListBox_Client.AddObject(Item);
-}
+  TThread.Queue(nil, procedure
+    begin
+      Memo_Client_Console.Lines.Add(GetNow() + ' ' + Message_Type);
+      Memo_Client_Console.Lines.Add(Message + chr(13) + chr(10));
+      Memo_Client_Console.SelStart:=Memo_Client_Console.Lines.Text.Length-1;
+    end);
 end;
 
 procedure TTabForm_Main.Button_Client_Send_OnClick(Sender: TObject);
@@ -175,7 +146,7 @@ begin
 
   try
     TCPClient_Main.Socket.WriteLn(Memo_Client_Message.Text);
-    ListBox_Client_Log(Sender, 'TX', Memo_Client_Message.Text);
+    Client_Log('TX', Memo_Client_Message.Text);
     Memo_Client_Message.Lines.Clear();
   except
     Button_Client_Connect_OnClick(Sender);
