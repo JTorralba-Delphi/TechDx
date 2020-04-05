@@ -79,38 +79,14 @@ object TabForm_Main: TTabForm_Main
         Size.PlatformDefault = False
         TextPrompt = 'IP'
       end
-      object ListBox_Client: TListBox
-        Position.X = 8.000000000000000000
-        Position.Y = 40.000000000000000000
-        Size.Width = 368.000000000000000000
-        Size.Height = 392.000000000000000000
-        Size.PlatformDefault = False
-        TabOrder = 3
-        TabStop = False
-        DisableFocusEffect = True
-        DefaultItemStyles.ItemStyle = ''
-        DefaultItemStyles.GroupHeaderStyle = ''
-        DefaultItemStyles.GroupFooterStyle = ''
-        Viewport.Width = 364.000000000000000000
-        Viewport.Height = 388.000000000000000000
-      end
-      object Edit_Client_Message: TEdit
-        Touch.InteractiveGestures = [LongTap, DoubleTap]
-        TabOrder = 4
-        Position.X = 8.000000000000000000
-        Position.Y = 440.000000000000000000
-        Size.Width = 280.000000000000000000
-        Size.Height = 22.000000000000000000
-        Size.PlatformDefault = False
-        TextPrompt = 'Message'
-      end
       object Button_Client_Send: TButton
+        Anchors = [akRight, akBottom]
         Position.X = 296.000000000000000000
         Position.Y = 440.000000000000000000
         Size.Width = 80.000000000000000000
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 5
+        TabOrder = 4
         Text = 'Send'
         OnClick = Button_Client_Send_OnClick
       end
@@ -123,6 +99,67 @@ object TabForm_Main: TTabForm_Main
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
         TextPrompt = 'Port'
+      end
+      object GridPanelLayout_Client: TGridPanelLayout
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        Position.X = 8.000000000000000000
+        Position.Y = 40.000000000000000000
+        Size.Width = 368.000000000000000000
+        Size.Height = 392.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 3
+        TabStop = False
+        ColumnCollection = <
+          item
+            Value = 100.000000000000000000
+          end>
+        ControlCollection = <
+          item
+            Column = 0
+            Control = Memo_Client_Console
+            Row = 0
+          end
+          item
+            Column = 0
+            Control = Memo_Client_Message
+            Row = 1
+          end>
+        RowCollection = <
+          item
+            Value = 50.000000000000000000
+          end
+          item
+            Value = 50.000000000000000000
+          end
+          item
+            SizeStyle = Auto
+          end>
+        object Memo_Client_Console: TMemo
+          Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+          DataDetectorTypes = []
+          Align = Client
+          Margins.Bottom = 4.000000000000000000
+          Size.Width = 368.000000000000000000
+          Size.Height = 192.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          TabStop = False
+          Viewport.Width = 364.000000000000000000
+          Viewport.Height = 188.000000000000000000
+        end
+        object Memo_Client_Message: TMemo
+          Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+          DataDetectorTypes = []
+          Align = Client
+          Enabled = False
+          Margins.Top = 4.000000000000000000
+          Size.Width = 368.000000000000000000
+          Size.Height = 192.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Viewport.Width = 364.000000000000000000
+          Viewport.Height = 188.000000000000000000
+        end
       end
     end
     object TabItem_Server: TTabItem

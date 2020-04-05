@@ -8,28 +8,30 @@ uses
   FMX.StdCtrls, FMX.Gestures, FMX.Controls.Presentation, FMX.ListView.Types,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base, FMX.ListView, FMX.Edit,
   FMX.Layouts, FMX.ListBox, IdBaseComponent, IdComponent, IdTCPConnection,
-  IdTCPClient;
+  IdTCPClient, FMX.ScrollBox, FMX.Memo;
 
 type
   TTabForm_Main = class(TForm)
     GestureManager_Main: TGestureManager;
+    StyleBook_Main: TStyleBook;
+    TCPClient_Main: TIdTCPClient;
+
     ToolBar_Main: TToolBar;
     Label_Main: TLabel;
     TabControl_Main: TTabControl;
 
     TabItem_Client: TTabItem;
-    Button_Client_Connect: TButton;
     Edit_Client_Remote_IP: TEdit;
-    ListBox_Client: TListBox;
-    Edit_Client_Message: TEdit;
+    Edit_Client_Remote_Port: TEdit;
+    Button_Client_Connect: TButton;
+    Memo_Client_Console: TMemo;
+    Memo_Client_Message: TMemo;
     Button_Client_Send: TButton;
 
     TabItem_Server: TTabItem;
     TabItem_ANIALI: TTabItem;
     TabItem_ProQA: TTabItem;
-    StyleBook_Main: TStyleBook;
-    Edit_Client_Remote_Port: TEdit;
-    TCPClient_Main: TIdTCPClient;
+    GridPanelLayout_Client: TGridPanelLayout;
 
     procedure FormCreate(Sender: TObject);
     procedure FormGesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
@@ -42,7 +44,6 @@ type
     procedure Button_Client_Send_OnClick(Sender: TObject);
     procedure TCPClient_Main_OnConnected(Sender: TObject);
     procedure TCPClient_Main_OnDisconnected(Sender: TObject);
-
 
   private
   public
@@ -87,6 +88,7 @@ procedure TTabForm_Main.Style_Test(Sender: TObject);
 var
   LBItem: TListBoxItem;
 begin
+{
   LBItem := TListBoxItem.Create(ListBox_Client);
   LBItem.Parent := ListBox_Client;
   LBItem.StyleLookup := 'Default';
@@ -110,6 +112,7 @@ begin
   LBItem.StyleLookup := 'RX';
   LBItem.StylesData['Message'] := 'RX';
   ListBox_Client.AddObject(LBItem);
+}
 end;
 
 procedure TTabForm_Main.TCPClient_Main_OnConnected(Sender: TObject);
@@ -124,6 +127,7 @@ end;
 
 procedure TTabForm_Main.Button_Client_Connect_OnClick(Sender: TObject);
 begin
+
   Client_Connected := not Client_Connected;
   if (Client_Connected)
   then
@@ -132,7 +136,7 @@ begin
         TCPClient_Main.Host := Edit_Client_Remote_IP.Text;
         TCPClient_Main.Port := Edit_Client_Remote_Port.Text.ToInteger;
         TCPClient_Main.Connect();
-        Edit_Client_Message.Enabled := True;
+        Memo_Client_Message.Enabled := True;
         Button_Client_Send.Enabled := True;
         Button_Client_Connect.Text := 'Disconnect';
       except
@@ -145,33 +149,39 @@ begin
       try
         TCPClient_Main.Disconnect();
       finally
-        Edit_Client_Message.Enabled := False;
+        Memo_Client_Message.Enabled := False;
         Button_Client_Send.Enabled := False;
         Button_Client_Connect.Text := 'Connect';
       end
     end
+
 end;
 
 procedure TTabForm_Main.ListBox_Client_Log(Sender: TObject; Message_Type: String; Message: String);
 var
   Item: TListBoxItem;
 begin
+{
   Item := TListBoxItem.Create(ListBox_Client);
   Item.Parent := ListBox_Client;
   Item.StyleLookup := Message_Type;
   Item.StylesData['Message'] := Message;
   ListBox_Client.AddObject(Item);
+}
 end;
 
 procedure TTabForm_Main.Button_Client_Send_OnClick(Sender: TObject);
 begin
+
   try
-    TCPClient_Main.Socket.WriteLn(Edit_Client_Message.Text);
-    ListBox_Client_Log(Sender, 'TX', Edit_Client_Message.Text);
+    TCPClient_Main.Socket.WriteLn(Memo_Client_Message.Text);
+    ListBox_Client_Log(Sender, 'TX', Memo_Client_Message.Text);
+    Memo_Client_Message.Lines.Clear();
   except
     Button_Client_Connect_OnClick(Sender);
     ShowMessage('Send failed.');
   end
+
 end;
 
 end.
