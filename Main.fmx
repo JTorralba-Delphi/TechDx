@@ -269,6 +269,7 @@ object TabForm_Main: TTabForm_Main
       end>
   end
   object TCPClient_Main: TIdTCPClient
+    OnStatus = TCPClient_Main_OnStatus
     OnDisconnected = TCPClient_Main_OnDisconnected
     OnConnected = TCPClient_Main_OnConnected
     ConnectTimeout = 0
@@ -277,5 +278,14 @@ object TabForm_Main: TTabForm_Main
     ReadTimeout = -1
     Left = 176
     Top = 400
+  end
+  object ThreadComponent_Main: TIdThreadComponent
+    Active = False
+    Loop = False
+    Priority = tpNormal
+    StopMode = smTerminate
+    OnRun = ThreadComponent_Main_OnRun
+    Left = 176
+    Top = 456
   end
 end

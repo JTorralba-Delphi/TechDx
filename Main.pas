@@ -8,7 +8,7 @@ uses
   FMX.StdCtrls, FMX.Gestures, FMX.Controls.Presentation, FMX.ListView.Types,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base, FMX.ListView, FMX.Edit,
   FMX.Layouts, FMX.ListBox, IdBaseComponent, IdComponent, IdTCPConnection,
-  IdTCPClient, FMX.ScrollBox, FMX.Memo;
+  IdTCPClient, FMX.ScrollBox, FMX.Memo, IdThreadComponent;
 
 type
   TTabForm_Main = class(TForm)
@@ -32,18 +32,22 @@ type
     TabItem_Server: TTabItem;
     TabItem_ANIALI: TTabItem;
     TabItem_ProQA: TTabItem;
+    ThreadComponent_Main: TIdThreadComponent;
 
     function GetNow():String;
 
-    procedure FormCreate(Sender: TObject);
     procedure FormGesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
 
-    procedure Button_Client_Connect_OnClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
 
-    Procedure Client_Log(Message_Type: String; Message :String);
-    procedure Button_Client_Send_OnClick(Sender: TObject);
     procedure TCPClient_Main_OnConnected(Sender: TObject);
     procedure TCPClient_Main_OnDisconnected(Sender: TObject);
+    procedure TCPClient_Main_OnStatus(ASender: TObject; const AStatus: TIdStatus; const AStatusText: string);
+    procedure ThreadComponent_Main_OnRun(Sender: TIdThreadComponent);
+
+    procedure Button_Client_Connect_OnClick(Sender: TObject);
+    Procedure Client_Log(Message_Type: String; Message :String);
+    procedure Button_Client_Send_OnClick(Sender: TObject);
 
   private
   public
@@ -51,6 +55,7 @@ end;
 
 var TabForm_Main: TTabForm_Main;
 var Client_Connected: Boolean;
+var CRLF: String;
 
 implementation
 
@@ -59,13 +64,6 @@ implementation
 function TTabForm_Main.GetNow() : String;
 begin
     result := FormatDateTime('yyyy-mm-dd hh:nn:ss', Now);
-end;
-
-procedure TTabForm_Main.FormCreate(Sender: TObject);
-begin
-  Application.Title := 'Technician Diagnostics';
-  TabControl_Main.ActiveTab := TabItem_Client;
-  Client_Connected := False;
 end;
 
 procedure TTabForm_Main.FormGesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
@@ -89,14 +87,51 @@ begin
 {$ENDIF}
 end;
 
+procedure TTabForm_Main.FormCreate(Sender: TObject);
+begin
+  Application.Title := 'Technician Diagnostics';
+  TabControl_Main.ActiveTab := TabItem_Client;
+  Client_Connected := False;
+  CRLF := chr(13) + chr(10);
+end;
+
 procedure TTabForm_Main.TCPClient_Main_OnConnected(Sender: TObject);
 begin
+  ThreadComponent_Main.Active := True;
+  Memo_Client_Message.Enabled := True;
+  Button_Client_Send.Enabled := True;
+  Button_Client_Connect.Text := 'Disconnect';
+  Memo_Client_Message.SetFocus();
   Client_Log('ST', 'Connected to server.');
 end;
 
 procedure TTabForm_Main.TCPClient_Main_OnDisconnected(Sender: TObject);
 begin
+  ThreadComponent_Main.Active := False;
+  Memo_Client_Message.Enabled := False;
+  Button_Client_Send.Enabled := False;
+  Button_Client_Connect.Text := 'Connect';
+  Button_Client_Connect.SetFocus();
   Client_Log('ST', 'Disconnected from server.');
+end;
+
+procedure TTabForm_Main.TCPClient_Main_OnStatus(ASender: TObject;
+  const AStatus: TIdStatus; const AStatusText: string);
+begin
+  if (not TCPClient_Main.Connected) and (Client_Connected)
+  then
+    begin
+      Client_Connected := False;
+      Client_Log('ST', 'Server terminated connection.');
+      TCPClient_Main_OnDisconnected(ASender);
+    end
+end;
+
+procedure TTabForm_Main.ThreadComponent_Main_OnRun(Sender: TIdThreadComponent);
+var Message: String;
+begin
+  Message := TCPClient_Main.IOHandler.ReadLn();
+  Client_Log('RX', Message);
 end;
 
 procedure TTabForm_Main.Button_Client_Connect_OnClick(Sender: TObject);
@@ -106,26 +141,33 @@ begin
   then
     begin
       try
+        TCPClient_Main.ConnectTimeout := 5000;
         TCPClient_Main.Host := Edit_Client_Remote_IP.Text;
         TCPClient_Main.Port := Edit_Client_Remote_Port.Text.ToInteger;
         TCPClient_Main.Connect();
-        Memo_Client_Message.Enabled := True;
-        Button_Client_Send.Enabled := True;
-        Button_Client_Connect.Text := 'Disconnect';
-      except
-        Client_Connected := False;
-        Client_Log('ST', 'Connect failed.');
-      end;
+       except
+        on E: Exception do
+          begin
+            Client_Connected := False;
+            Client_Log('ST', '** Connect_Exception **' + CRLF + E.Message);
+          end
+      end
     end
   else
     begin
       try
-        TCPClient_Main.Disconnect();
-      finally
-        Memo_Client_Message.Enabled := False;
-        Button_Client_Send.Enabled := False;
-        Button_Client_Connect.Text := 'Connect';
-      end
+        TCPClient_Main.Disconnect;
+      except
+        on E: Exception do
+          begin
+            Client_Connected := False;
+            Client_Log('ST', '** Disconnect_Exception **' + CRLF + E.Message);
+            TCPClient_Main_OnDisconnected(Sender);
+            TCPClient_Main.IOHandler.InputBuffer.Clear;
+            TCPClient_Main.IOHandler.CloseGracefully;
+            TCPClient_Main.Disconnect;
+          end
+      end;
     end
 end;
 
@@ -134,9 +176,10 @@ begin
   TThread.Queue(nil, procedure
     begin
       Memo_Client_Console.Lines.Add(GetNow() + ' ' + Message_Type);
-      Memo_Client_Console.Lines.Add(Message + chr(13) + chr(10));
-      Memo_Client_Console.SelStart:=Memo_Client_Console.Lines.Text.Length-1;
-    end);
+      Memo_Client_Console.Lines.Add(Message + CRLF);
+      Memo_Client_Console.SelStart := Memo_Client_Console.Lines.Text.Length - 1;
+    end
+  );
 end;
 
 procedure TTabForm_Main.Button_Client_Send_OnClick(Sender: TObject);
@@ -146,8 +189,15 @@ begin
     Client_Log('TX', Memo_Client_Message.Text);
     Memo_Client_Message.Lines.Clear();
   except
-    Button_Client_Connect_OnClick(Sender);
-    Client_Log('ST', 'Send failed.');
+    on E: Exception do
+      begin
+        Client_Connected := False;
+        Client_Log('ST', '** Send_Exception **' + CRLF + E.Message);
+        TCPClient_Main_OnDisconnected(Sender);
+        TCPClient_Main.IOHandler.InputBuffer.Clear;
+        TCPClient_Main.IOHandler.CloseGracefully;
+        TCPClient_Main.Disconnect;
+      end
   end;
   Memo_Client_Message.SetFocus();
 end;
