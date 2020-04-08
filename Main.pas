@@ -8,13 +8,13 @@ uses
   FMX.StdCtrls, FMX.Gestures, FMX.Controls.Presentation, FMX.ListView.Types,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base, FMX.ListView, FMX.Edit,
   FMX.Layouts, FMX.ListBox, IdBaseComponent, IdComponent, IdTCPConnection,
-  IdTCPClient, FMX.ScrollBox, FMX.Memo, IdThreadComponent;
+  IdTCPClient, FMX.ScrollBox, FMX.Memo, IDThreadComponent, IDGlobal;
 
 type
   TTabForm_Main = class(TForm)
     GestureManager_Main: TGestureManager;
     StyleBook_Main: TStyleBook;
-    TCPClient_Main: TIdTCPClient;
+    TCPClient_Main: TIDTCPClient;
 
     ToolBar_Main: TToolBar;
     Label_Main: TLabel;
@@ -32,7 +32,7 @@ type
     TabItem_Server: TTabItem;
     TabItem_ANIALI: TTabItem;
     TabItem_ProQA: TTabItem;
-    ThreadComponent_Main: TIdThreadComponent;
+    ThreadComponent_Main: TIDThreadComponent;
 
     function GetNow():String;
 
@@ -42,8 +42,8 @@ type
 
     procedure TCPClient_Main_OnConnected(Sender: TObject);
     procedure TCPClient_Main_OnDisconnected(Sender: TObject);
-    procedure TCPClient_Main_OnStatus(ASender: TObject; const AStatus: TIdStatus; const AStatusText: string);
-    procedure ThreadComponent_Main_OnRun(Sender: TIdThreadComponent);
+    procedure TCPClient_Main_OnStatus(ASender: TObject; const AStatus: TIDStatus; const AStatusText: String);
+    procedure ThreadComponent_Main_OnRun(Sender: TIDThreadComponent);
 
     procedure Button_Client_Connect_OnClick(Sender: TObject);
     Procedure Client_Log(Message_Type: String; Message :String);
@@ -70,20 +70,20 @@ procedure TTabForm_Main.FormGesture(Sender: TObject; const EventInfo: TGestureEv
 begin
 {$IFDEF ANDROID}
   case EventInfo.GestureID of
-    sgiLeft:
+    SGILeft:
     begin
-      if TabControl_Main.ActiveTab <> TabControl_Main.Tabs[TabControl_Main.TabCount-1] then
-        TabControl_Main.ActiveTab := TabControl_Main.Tabs[TabControl_Main.TabIndex+1];
+      if TabControl_Main.ActiveTab <> TabControl_Main.Tabs[TabControl_Main.TabCount - 1] then
+        TabControl_Main.ActiveTab := TabControl_Main.Tabs[TabControl_Main.TabIndex + 1];
       Handled := True;
-    end;
+    end
 
-    sgiRight:
+    SGIRight:
     begin
       if TabControl_Main.ActiveTab <> TabControl_Main.Tabs[0] then
-        TabControl_Main.ActiveTab := TabControl_Main.Tabs[TabControl_Main.TabIndex-1];
+        TabControl_Main.ActiveTab := TabControl_Main.Tabs[TabControl_Main.TabIndex - 1];
       Handled := True;
-    end;
-  end;
+    end
+  end
 {$ENDIF}
 end;
 
@@ -92,7 +92,7 @@ begin
   Application.Title := 'Technician Diagnostics';
   TabControl_Main.ActiveTab := TabItem_Client;
   Client_Connected := False;
-  CRLF := chr(13) + chr(10);
+  CRLF := Chr(13) + Chr(10);
 end;
 
 procedure TTabForm_Main.TCPClient_Main_OnConnected(Sender: TObject);
@@ -115,8 +115,7 @@ begin
   Client_Log('ST', 'Disconnected from server.');
 end;
 
-procedure TTabForm_Main.TCPClient_Main_OnStatus(ASender: TObject;
-  const AStatus: TIdStatus; const AStatusText: string);
+procedure TTabForm_Main.TCPClient_Main_OnStatus(ASender: TObject; const AStatus: TIDStatus; const AStatusText: String);
 begin
   if (not TCPClient_Main.Connected) and (Client_Connected)
   then
@@ -127,10 +126,25 @@ begin
     end
 end;
 
-procedure TTabForm_Main.ThreadComponent_Main_OnRun(Sender: TIdThreadComponent);
+procedure TTabForm_Main.ThreadComponent_Main_OnRun(Sender: TIDThreadComponent);
+var Bytes: TIDBytes;
 var Message: String;
+
 begin
-  Message := TCPClient_Main.IOHandler.ReadLn();
+  if TCPClient_Main.IOHandler.InputBufferIsEmpty
+  then
+    begin
+      TCPClient_Main.IOHandler.CheckForDataOnSource(250);
+      TCPClient_Main.IOHandler.CheckForDisconnect;
+      if TCPClient_Main.IOHandler.InputBufferIsEmpty
+        then
+          begin
+            Exit;
+          end
+    end;
+
+  TCPClient_Main.IOHandler.ReadBytes(Bytes, TCPClient_Main.IOHandler.InputBuffer.Size);
+  Message := BytesToString(Bytes,IndyTextEncoding_UTF8);
   Client_Log('RX', Message);
 end;
 
@@ -141,7 +155,7 @@ begin
   then
     begin
       try
-        TCPClient_Main.ConnectTimeout := 5000;
+        TCPClient_Main.ConnectTimeout := 2500;
         TCPClient_Main.Host := Edit_Client_Remote_IP.Text;
         TCPClient_Main.Port := Edit_Client_Remote_Port.Text.ToInteger;
         TCPClient_Main.Connect();
@@ -167,7 +181,7 @@ begin
             TCPClient_Main.IOHandler.CloseGracefully;
             TCPClient_Main.Disconnect;
           end
-      end;
+      end
     end
 end;
 
