@@ -194,6 +194,7 @@ begin
         Message := LeftStr(Message, Message.Length - 1);
       end;
 
+      Memo_Client_Console.Lines.Add('----------------------------------------------------------------------');
       Memo_Client_Console.Lines.Add(GetNow() + ' ' + Message_Type);
       Memo_Client_Console.Lines.Add(Message + CRLF);
       Memo_Client_Console.SelStart := Memo_Client_Console.Lines.Text.Length - 1;
