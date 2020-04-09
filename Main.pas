@@ -8,7 +8,7 @@ uses
   FMX.StdCtrls, FMX.Gestures, FMX.Controls.Presentation, FMX.ListView.Types,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base, FMX.ListView, FMX.Edit,
   FMX.Layouts, FMX.ListBox, IdBaseComponent, IdComponent, IdTCPConnection,
-  IdTCPClient, FMX.ScrollBox, FMX.Memo, IDThreadComponent, IDGlobal;
+  IdTCPClient, FMX.ScrollBox, FMX.Memo, IDThreadComponent, IDGlobal, System.StrUtils;
 
 type
   TTabForm_Main = class(TForm)
@@ -189,6 +189,11 @@ procedure TTabForm_Main.Client_Log(Message_Type: String; Message: String);
 begin
   TThread.Queue(nil, procedure
     begin
+      while (RightStr(Message,1) = Chr(13)) or (RightStr(Message,1) = Chr(10)) do
+      begin
+        Message := LeftStr(Message, Message.Length - 1);
+      end;
+
       Memo_Client_Console.Lines.Add(GetNow() + ' ' + Message_Type);
       Memo_Client_Console.Lines.Add(Message + CRLF);
       Memo_Client_Console.SelStart := Memo_Client_Console.Lines.Text.Length - 1;
