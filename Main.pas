@@ -34,7 +34,7 @@ type
     TabItem_ProQA: TTabItem;
     ThreadComponent_Main: TIDThreadComponent;
 
-    function GetNow():String;
+    function GetNow(): String;
 
     procedure FormGesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
 
@@ -46,7 +46,7 @@ type
     procedure ThreadComponent_Main_OnRun(Sender: TIDThreadComponent);
 
     procedure Button_Client_Connect_OnClick(Sender: TObject);
-    Procedure Client_Log(Message_Type: String; Message :String);
+    Procedure Client_Log(Message_Type: String; Message: String);
     procedure Button_Client_Send_OnClick(Sender: TObject);
 
   private
@@ -61,7 +61,7 @@ implementation
 
 {$R *.fmx}
 
-function TTabForm_Main.GetNow() : String;
+function TTabForm_Main.GetNow(): String;
 begin
     result := FormatDateTime('yyyy-mm-dd hh:nn:ss', Now);
 end;
@@ -190,12 +190,12 @@ procedure TTabForm_Main.Client_Log(Message_Type: String; Message: String);
 begin
   TThread.Queue(nil, procedure
     begin
-      while (LeftStr(Message,1) = Chr(13)) or (LeftStr(Message,1) = Chr(10)) do
+      while (LeftStr(Message, 1) = Chr(13)) or (LeftStr(Message, 1) = Chr(10)) do
       begin
         Message := RightStr(Message, Message.Length - 1);
       end;
 
-      while (RightStr(Message,1) = Chr(13)) or (RightStr(Message,1) = Chr(10)) do
+      while (RightStr(Message, 1) = Chr(13)) or (RightStr(Message, 1) = Chr(10)) do
       begin
         Message := LeftStr(Message, Message.Length - 1);
       end;
