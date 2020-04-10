@@ -46,7 +46,7 @@ type
     procedure ThreadComponent_Main_OnRun(Sender: TIDThreadComponent);
 
     procedure Button_Client_Connect_OnClick(Sender: TObject);
-    Procedure Client_Log(Message_Type: String; Message: String);
+    Procedure Client_Log(Message_Type: String; Message: String; TimeStamp : String);
     procedure Button_Client_Send_OnClick(Sender: TObject);
 
   private
@@ -96,41 +96,49 @@ begin
 end;
 
 procedure TTabForm_Main.TCPClient_Main_OnConnected(Sender: TObject);
+var TimeStamp : String;
 begin
+  TimeStamp := GetNow();
   ThreadComponent_Main.Active := True;
   Memo_Client_Message.Enabled := True;
   Button_Client_Send.Enabled := True;
   Button_Client_Connect.Text := 'Disconnect';
   Memo_Client_Message.SetFocus();
-  Client_Log('ST', 'Connected to server.');
+  Client_Log('ST', 'Connected to server.', TimeStamp);
 end;
 
 procedure TTabForm_Main.TCPClient_Main_OnDisconnected(Sender: TObject);
+var TimeStamp : String;
 begin
+  TimeStamp := GetNow();
   ThreadComponent_Main.Active := False;
   Memo_Client_Message.Enabled := False;
   Button_Client_Send.Enabled := False;
   Button_Client_Connect.Text := 'Connect';
   Button_Client_Connect.SetFocus();
-  Client_Log('ST', 'Disconnected from server.');
+  Client_Log('ST', 'Disconnected from server.', TimeStamp);
 end;
 
 procedure TTabForm_Main.TCPClient_Main_OnStatus(ASender: TObject; const AStatus: TIDStatus; const AStatusText: String);
+var TimeStamp : String;
 begin
+  TimeStamp := GetNow();
   if (not TCPClient_Main.Connected) and (Client_Connected)
   then
     begin
       Client_Connected := False;
-      Client_Log('ST', 'Server terminated connection.');
+      Client_Log('ST', 'Server terminated connection.', TimeStamp);
       TCPClient_Main_OnDisconnected(ASender);
     end
 end;
 
 procedure TTabForm_Main.ThreadComponent_Main_OnRun(Sender: TIDThreadComponent);
-var Bytes: TIDBytes;
-var Message: String;
+var TimeStamp : String;
+var Bytes : TIDBytes;
+var Message : String;
 
 begin
+  TimeStamp := GetNow();
   if TCPClient_Main.IOHandler.InputBufferIsEmpty
   then
     begin
@@ -146,11 +154,13 @@ begin
   {TCPClient_Main.IOHandler.ReadBytes(Bytes, TCPClient_Main.IOHandler.InputBuffer.Size);}
   TCPClient_Main.IOHandler.ReadBytes(Bytes, -1);
   Message := BytesToString(Bytes,IndyTextEncoding_UTF8);
-  Client_Log('RX', Message);
+  Client_Log('RX', Message, TimeStamp);
 end;
 
 procedure TTabForm_Main.Button_Client_Connect_OnClick(Sender: TObject);
+var TimeStamp : String;
 begin
+  TimeStamp := GetNow();
   Client_Connected := not Client_Connected;
   if (Client_Connected)
   then
@@ -164,7 +174,7 @@ begin
         on E: Exception do
           begin
             Client_Connected := False;
-            Client_Log('ST', '** Connect_Exception **' + CRLF + E.Message);
+            Client_Log('ST', '** Connect_Exception **' + CRLF + E.Message, TimeStamp);
           end
       end
     end
@@ -176,7 +186,7 @@ begin
         on E: Exception do
           begin
             Client_Connected := False;
-            Client_Log('ST', '** Disconnect_Exception **' + CRLF + E.Message);
+            Client_Log('ST', '** Disconnect_Exception **' + CRLF + E.Message, TimeStamp);
             TCPClient_Main_OnDisconnected(Sender);
             TCPClient_Main.IOHandler.InputBuffer.Clear;
             TCPClient_Main.IOHandler.CloseGracefully;
@@ -186,7 +196,7 @@ begin
     end
 end;
 
-procedure TTabForm_Main.Client_Log(Message_Type: String; Message: String);
+procedure TTabForm_Main.Client_Log(Message_Type: String; Message: String; TimeStamp: String);
 begin
   TThread.Queue(nil, procedure
     begin
@@ -201,7 +211,7 @@ begin
       end;
 
       Memo_Client_Console.Lines.Add('----------------------------------------------------------------------');
-      Memo_Client_Console.Lines.Add(GetNow() + ' ' + Message_Type + ' ' + Message.Length.ToString() + ' Byte(s)');
+      Memo_Client_Console.Lines.Add(TimeStamp + ' ' + Message_Type + ' ' + Message.Length.ToString() + ' Byte(s)');
       Memo_Client_Console.Lines.Add(Message + CRLF);
       Memo_Client_Console.SelStart := Memo_Client_Console.Lines.Text.Length - 1;
     end
@@ -209,16 +219,18 @@ begin
 end;
 
 procedure TTabForm_Main.Button_Client_Send_OnClick(Sender: TObject);
+var TimeStamp : String;
 begin
+  TimeStamp := GetNow();
   try
     TCPClient_Main.Socket.WriteLn(Memo_Client_Message.Text);
-    Client_Log('TX', Memo_Client_Message.Text);
+    Client_Log('TX', Memo_Client_Message.Text, TimeStamp);
     Memo_Client_Message.Lines.Clear();
   except
     on E: Exception do
       begin
         Client_Connected := False;
-        Client_Log('ST', '** Send_Exception **' + CRLF + E.Message);
+        Client_Log('ST', '** Send_Exception **' + CRLF + E.Message, TimeStamp);
         TCPClient_Main_OnDisconnected(Sender);
         TCPClient_Main.IOHandler.InputBuffer.Clear;
         TCPClient_Main.IOHandler.CloseGracefully;
