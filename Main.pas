@@ -189,6 +189,11 @@ procedure TTabForm_Main.Client_Log(Message_Type: String; Message: String);
 begin
   TThread.Queue(nil, procedure
     begin
+      while (LeftStr(Message,1) = Chr(13)) or (LeftStr(Message,1) = Chr(10)) do
+      begin
+        Message := RightStr(Message, Message.Length - 1);
+      end;
+
       while (RightStr(Message,1) = Chr(13)) or (RightStr(Message,1) = Chr(10)) do
       begin
         Message := LeftStr(Message, Message.Length - 1);
