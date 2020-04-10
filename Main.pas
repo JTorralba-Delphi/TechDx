@@ -46,7 +46,7 @@ type
     procedure ThreadComponent_Main_OnRun(Sender: TIDThreadComponent);
 
     procedure Client_Release(Sender : TObject);
-    Procedure Client_Log(Message_Type: String; Message: String; TimeStamp : String);
+    Procedure Client_Log(Message_Type: String; Message: String; TimeStamp: String; IP_From: String; IP_To: String);
     procedure Button_Client_Connect_OnClick(Sender: TObject);
     procedure Button_Client_Send_OnClick(Sender: TObject);
 
@@ -57,6 +57,8 @@ end;
 var TabForm_Main: TTabForm_Main;
 var Client_Connected: Boolean;
 var CRLF: String;
+var IP_Client: String;
+var IP_Remote: String;
 
 implementation
 
@@ -105,7 +107,9 @@ begin
   Button_Client_Send.Enabled := True;
   Button_Client_Connect.Text := 'Disconnect';
   Memo_Client_Message.SetFocus();
-  Client_Log('ST', 'Connected to server.', TimeStamp);
+  Client_Log('ST', 'Connected to server.', TimeStamp, IP_Client, IP_Client);
+  IP_Client := TCPClient_Main.Socket.Binding.IP;
+  IP_Remote := TCPClient_Main.Socket.Binding.PeerIP;
 end;
 
 procedure TTabForm_Main.TCPClient_Main_OnDisconnected(Sender: TObject);
@@ -117,7 +121,9 @@ begin
   Button_Client_Send.Enabled := False;
   Button_Client_Connect.Text := 'Connect';
   Button_Client_Connect.SetFocus();
-  Client_Log('ST', 'Disconnected from server.', TimeStamp);
+  Client_Log('ST', 'Disconnected from server.', TimeStamp, IP_Client, IP_Client);
+  IP_Client := '';
+  IP_Remote := '';
 end;
 
 procedure TTabForm_Main.TCPClient_Main_OnStatus(ASender: TObject; const AStatus: TIDStatus; const AStatusText: String);
@@ -128,7 +134,7 @@ begin
   then
     begin
       Client_Connected := False;
-      Client_Log('ST', 'Server terminated connection.', TimeStamp);
+      Client_Log('ST', 'Server terminated connection.', TimeStamp, IP_Client, IP_Client);
       TCPClient_Main_OnDisconnected(ASender);
     end
 end;
@@ -155,7 +161,7 @@ begin
   {TCPClient_Main.IOHandler.ReadBytes(Bytes, TCPClient_Main.IOHandler.InputBuffer.Size);}
   TCPClient_Main.IOHandler.ReadBytes(Bytes, -1);
   Message := BytesToString(Bytes,IndyTextEncoding_UTF8);
-  Client_Log('RX', Message, TimeStamp);
+  Client_Log('RX', Message, TimeStamp, IP_Remote, IP_Client);
 end;
 
 procedure TTabForm_Main.Button_Client_Connect_OnClick(Sender: TObject);
@@ -175,7 +181,7 @@ begin
         on E: Exception do
           begin
             Client_Connected := False;
-            Client_Log('ST', '** Connect_Exception **' + CRLF + E.Message, TimeStamp);
+            Client_Log('ST', '** Connect_Exception **' + CRLF + E.Message, TimeStamp, IP_Client, IP_Client);
           end
       end
     end
@@ -187,7 +193,7 @@ begin
         on E: Exception do
           begin
             Client_Connected := False;
-            Client_Log('ST', '** Disconnect_Exception **' + CRLF + E.Message, TimeStamp);
+            Client_Log('ST', '** Disconnect_Exception **' + CRLF + E.Message, TimeStamp, IP_Client, IP_Client);
             Client_Release(Sender);
           end
       end
@@ -202,7 +208,7 @@ begin
   TCPClient_Main.Disconnect;
 end;
 
-procedure TTabForm_Main.Client_Log(Message_Type: String; Message: String; TimeStamp: String);
+procedure TTabForm_Main.Client_Log(Message_Type: String; Message: String; TimeStamp: String; IP_From: String; IP_To: String);
 begin
   TThread.Queue(nil, procedure
     begin
@@ -218,6 +224,12 @@ begin
 
       Memo_Client_Console.Lines.Add('----------------------------------------------------------------------');
       Memo_Client_Console.Lines.Add(TimeStamp + ' ' + Message_Type + ' ' + Message.Length.ToString() + ' Byte(s)');
+
+      if IP_From <> IP_To then
+        begin
+          Memo_Client_Console.Lines.Add(IP_From + ' --> ' + IP_To);
+        end;
+
       Memo_Client_Console.Lines.Add(Message + CRLF);
       Memo_Client_Console.SelStart := Memo_Client_Console.Lines.Text.Length - 1;
     end
@@ -230,13 +242,13 @@ begin
   TimeStamp := GetNow();
   try
     TCPClient_Main.Socket.WriteLn(Memo_Client_Message.Text);
-    Client_Log('TX', Memo_Client_Message.Text, TimeStamp);
+    Client_Log('TX' , Memo_Client_Message.Text, TimeStamp, IP_Client, IP_Remote);
     Memo_Client_Message.Lines.Clear();
   except
     on E: Exception do
       begin
         Client_Connected := False;
-        Client_Log('ST', '** Send_Exception **' + CRLF + E.Message, TimeStamp);
+        Client_Log('ST', '** Send_Exception **' + CRLF + E.Message, TimeStamp, IP_Client, IP_Client);
         Client_Release(Sender);
       end
   end;
