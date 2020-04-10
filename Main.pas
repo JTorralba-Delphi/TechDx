@@ -45,8 +45,9 @@ type
     procedure TCPClient_Main_OnStatus(ASender: TObject; const AStatus: TIDStatus; const AStatusText: String);
     procedure ThreadComponent_Main_OnRun(Sender: TIDThreadComponent);
 
-    procedure Button_Client_Connect_OnClick(Sender: TObject);
+    procedure Client_Release(Sender : TObject);
     Procedure Client_Log(Message_Type: String; Message: String; TimeStamp : String);
+    procedure Button_Client_Connect_OnClick(Sender: TObject);
     procedure Button_Client_Send_OnClick(Sender: TObject);
 
   private
@@ -157,7 +158,7 @@ begin
   Client_Log('RX', Message, TimeStamp);
 end;
 
-procedure TTabForm_Main.Button_Client_Connect_OnClick(Sender: TObject);
+procedure TTabForm_Main.Button_Client_Connect_OnClick(Sender : TObject);
 var TimeStamp : String;
 begin
   TimeStamp := GetNow();
@@ -187,13 +188,18 @@ begin
           begin
             Client_Connected := False;
             Client_Log('ST', '** Disconnect_Exception **' + CRLF + E.Message, TimeStamp);
-            TCPClient_Main_OnDisconnected(Sender);
-            TCPClient_Main.IOHandler.InputBuffer.Clear;
-            TCPClient_Main.IOHandler.CloseGracefully;
-            TCPClient_Main.Disconnect;
+            Client_Release(Sender);
           end
       end
     end
+end;
+
+procedure TTabForm_Main.Client_Release(Sender : TObject);
+begin
+  TCPClient_Main_OnDisconnected(Sender);
+  TCPClient_Main.IOHandler.InputBuffer.Clear;
+  TCPClient_Main.IOHandler.CloseGracefully;
+  TCPClient_Main.Disconnect;
 end;
 
 procedure TTabForm_Main.Client_Log(Message_Type: String; Message: String; TimeStamp: String);
@@ -231,10 +237,7 @@ begin
       begin
         Client_Connected := False;
         Client_Log('ST', '** Send_Exception **' + CRLF + E.Message, TimeStamp);
-        TCPClient_Main_OnDisconnected(Sender);
-        TCPClient_Main.IOHandler.InputBuffer.Clear;
-        TCPClient_Main.IOHandler.CloseGracefully;
-        TCPClient_Main.Disconnect;
+        Client_Release(Sender);
       end
   end;
   Memo_Client_Message.SetFocus();
