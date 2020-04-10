@@ -143,7 +143,8 @@ begin
           end
     end;
 
-  TCPClient_Main.IOHandler.ReadBytes(Bytes, TCPClient_Main.IOHandler.InputBuffer.Size);
+  {TCPClient_Main.IOHandler.ReadBytes(Bytes, TCPClient_Main.IOHandler.InputBuffer.Size);}
+  TCPClient_Main.IOHandler.ReadBytes(Bytes, -1);
   Message := BytesToString(Bytes,IndyTextEncoding_UTF8);
   Client_Log('RX', Message);
 end;
@@ -200,7 +201,7 @@ begin
       end;
 
       Memo_Client_Console.Lines.Add('----------------------------------------------------------------------');
-      Memo_Client_Console.Lines.Add(GetNow() + ' ' + Message_Type);
+      Memo_Client_Console.Lines.Add(GetNow() + ' ' + Message_Type + ' ' + Message.Length.ToString() + ' Byte(s)');
       Memo_Client_Console.Lines.Add(Message + CRLF);
       Memo_Client_Console.SelStart := Memo_Client_Console.Lines.Text.Length - 1;
     end
