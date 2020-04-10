@@ -158,7 +158,7 @@ begin
   Client_Log('RX', Message, TimeStamp);
 end;
 
-procedure TTabForm_Main.Button_Client_Connect_OnClick(Sender : TObject);
+procedure TTabForm_Main.Button_Client_Connect_OnClick(Sender: TObject);
 var TimeStamp : String;
 begin
   TimeStamp := GetNow();
@@ -194,7 +194,7 @@ begin
     end
 end;
 
-procedure TTabForm_Main.Client_Release(Sender : TObject);
+procedure TTabForm_Main.Client_Release(Sender: TObject);
 begin
   TCPClient_Main_OnDisconnected(Sender);
   TCPClient_Main.IOHandler.InputBuffer.Clear;
