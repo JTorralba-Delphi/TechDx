@@ -77,7 +77,7 @@ object TabForm_Main: TTabForm_Main
         Size.Width = 232.000000000000000000
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
-        TextPrompt = 'IP'
+        TextPrompt = 'Remote IP'
       end
       object Button_Client_Send: TButton
         Anchors = [akRight, akBottom]
