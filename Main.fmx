@@ -36,7 +36,7 @@ object TabForm_Main: TTabForm_Main
     Size.Height = 519.000000000000000000
     Size.PlatformDefault = False
     TabHeight = 49.000000000000000000
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 1
     TabStop = False
     TabPosition = PlatformDefault
@@ -53,7 +53,7 @@ object TabForm_Main: TTabForm_Main
       CustomIcon = <
         item
         end>
-      IsSelected = True
+      IsSelected = False
       Size.Width = 95.000000000000000000
       Size.Height = 49.000000000000000000
       Size.PlatformDefault = False
@@ -168,7 +168,7 @@ object TabForm_Main: TTabForm_Main
       CustomIcon = <
         item
         end>
-      IsSelected = False
+      IsSelected = True
       Size.Width = 95.000000000000000000
       Size.Height = 49.000000000000000000
       Size.PlatformDefault = False
@@ -177,6 +177,142 @@ object TabForm_Main: TTabForm_Main
       Text = 'Server'
       ExplicitSize.cx = 50.000000000000000000
       ExplicitSize.cy = 49.000000000000000000
+      object Edit_Server_Local_IP: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 0
+        TabStop = False
+        TextSettings.Font.StyleExt = {00040000000200000004000000}
+        Position.X = 8.000000000000000000
+        Position.Y = 10.000000000000000000
+        Enabled = False
+        Size.Width = 232.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TextPrompt = 'Local IP'
+        StyledSettings = [Family, Size, FontColor]
+      end
+      object Edit_Server_Local_Port: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 1
+        Text = '9110'
+        Position.X = 248.000000000000000000
+        Position.Y = 10.000000000000000000
+        Size.Width = 40.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TextPrompt = 'Port'
+      end
+      object Button_Server_Start: TButton
+        Position.X = 296.000000000000000000
+        Position.Y = 10.000000000000000000
+        TabOrder = 2
+        Text = 'Start'
+      end
+      object GridPanelLayout_Server: TGridPanelLayout
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        Position.X = 8.000000000000000000
+        Position.Y = 40.000000000000000000
+        Size.Width = 368.000000000000000000
+        Size.Height = 392.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 3
+        TabStop = False
+        ColumnCollection = <
+          item
+            Value = 100.000000000000000000
+          end>
+        ControlCollection = <
+          item
+            Column = 0
+            Control = Memo_Server_Console
+            Row = 0
+          end
+          item
+            Column = 0
+            Control = Memo_Server_Message
+            Row = 1
+          end>
+        RowCollection = <
+          item
+            Value = 50.000000000000000000
+          end
+          item
+            Value = 50.000000000000000000
+          end
+          item
+            SizeStyle = Auto
+          end>
+        object Memo_Server_Console: TMemo
+          Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+          DataDetectorTypes = []
+          ReadOnly = True
+          Align = Client
+          Margins.Bottom = 4.000000000000000000
+          Size.Width = 368.000000000000000000
+          Size.Height = 192.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          TabStop = False
+          Viewport.Width = 364.000000000000000000
+          Viewport.Height = 188.000000000000000000
+        end
+        object Memo_Server_Message: TMemo
+          Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+          DataDetectorTypes = []
+          Align = Client
+          Enabled = False
+          Margins.Top = 4.000000000000000000
+          Size.Width = 368.000000000000000000
+          Size.Height = 192.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Viewport.Width = 364.000000000000000000
+          Viewport.Height = 188.000000000000000000
+        end
+      end
+      object Button_Server_Send: TButton
+        Anchors = [akRight, akBottom]
+        Enabled = False
+        Position.X = 296.000000000000000000
+        Position.Y = 440.000000000000000000
+        Size.Width = 80.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 7
+        Text = 'Send'
+        OnClick = Button_Client_Send_OnClick
+      end
+      object RadioButton_Server_Echo: TRadioButton
+        Anchors = [akLeft, akBottom]
+        IsChecked = True
+        Position.X = 8.000000000000000000
+        Position.Y = 440.000000000000000000
+        Size.Width = 80.000000000000000000
+        Size.Height = 19.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 4
+        Text = 'Echo'
+      end
+      object RadioButton_Server_Proxy: TRadioButton
+        Anchors = [akLeft, akBottom]
+        Position.X = 84.000000000000000000
+        Position.Y = 440.000000000000000000
+        Size.Width = 80.000000000000000000
+        Size.Height = 19.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 5
+        Text = 'Proxy'
+      end
+      object RadioButton_Server_Interactive: TRadioButton
+        Anchors = [akLeft, akBottom]
+        Position.X = 160.000000000000000000
+        Position.Y = 440.000000000000000000
+        Size.Width = 80.000000000000000000
+        Size.Height = 19.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 6
+        Text = 'Interactive'
+      end
     end
     object TabItem_ANIALI: TTabItem
       CustomIcon = <
@@ -287,5 +423,11 @@ object TabForm_Main: TTabForm_Main
     OnRun = ThreadComponent_Main_OnRun
     Left = 176
     Top = 456
+  end
+  object TCPServer_Main: TIdTCPServer
+    Bindings = <>
+    DefaultPort = 0
+    Left = 176
+    Top = 512
   end
 end

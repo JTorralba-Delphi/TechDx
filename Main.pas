@@ -8,7 +8,9 @@ uses
   FMX.StdCtrls, FMX.Gestures, FMX.Controls.Presentation, FMX.ListView.Types,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base, FMX.ListView, FMX.Edit,
   FMX.Layouts, FMX.ListBox, IdBaseComponent, IdComponent, IdTCPConnection,
-  IdTCPClient, FMX.ScrollBox, FMX.Memo, IDThreadComponent, IDGlobal, System.StrUtils;
+  IdTCPClient, FMX.ScrollBox, FMX.Memo, IDThreadComponent, IDGlobal, System.StrUtils,
+  IDCustomTCPServer, IDTCPServer,
+  IDStack;
 
 type
   TTabForm_Main = class(TForm)
@@ -33,10 +35,22 @@ type
     TabItem_ANIALI: TTabItem;
     TabItem_ProQA: TTabItem;
     ThreadComponent_Main: TIDThreadComponent;
-
-    function GetNow(): String;
+    Edit_Server_Local_IP: TEdit;
+    TCPServer_Main: TIdTCPServer;
+    Edit_Server_Local_Port: TEdit;
+    Button_Server_Start: TButton;
+    GridPanelLayout_Server: TGridPanelLayout;
+    Memo_Server_Console: TMemo;
+    Memo_Server_Message: TMemo;
+    Button_Server_Send: TButton;
+    RadioButton_Server_Echo: TRadioButton;
+    RadioButton_Server_Proxy: TRadioButton;
+    RadioButton_Server_Interactive: TRadioButton;
 
     procedure FormGesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
+
+    function GetNow(): String;
+    function Get_Local_IP(): String;
 
     procedure FormCreate(Sender: TObject);
 
@@ -59,15 +73,11 @@ var Client_Connected: Boolean;
 var CRLF: String;
 var IP_Client: String;
 var IP_Remote: String;
+var IP_Local: String;
 
 implementation
 
 {$R *.fmx}
-
-function TTabForm_Main.GetNow(): String;
-begin
-    result := FormatDateTime('yyyy-mm-dd hh:nn:ss', Now);
-end;
 
 procedure TTabForm_Main.FormGesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
 begin
@@ -90,12 +100,30 @@ begin
 {$ENDIF}
 end;
 
+function TTabForm_Main.GetNow(): String;
+begin
+    result := FormatDateTime('yyyy-mm-dd hh:nn:ss', Now);
+end;
+
+function TTabForm_Main.Get_Local_IP() : String;
+begin
+  TIDStack.IncUsage;
+  try
+    Result := GStack.LocalAddress;
+  finally
+    TIDStack.DecUsage;
+  end;
+end;
+
 procedure TTabForm_Main.FormCreate(Sender: TObject);
 begin
   Application.Title := 'Technician Diagnostics';
   TabControl_Main.ActiveTab := TabItem_Client;
   Client_Connected := False;
   CRLF := Chr(13) + Chr(10);
+
+  IP_Local := Get_Local_IP();
+  Edit_Server_Local_IP.Text := 'Local IP = ' + IP_Local;
 end;
 
 procedure TTabForm_Main.TCPClient_Main_OnConnected(Sender: TObject);
