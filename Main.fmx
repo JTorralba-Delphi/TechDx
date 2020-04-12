@@ -207,6 +207,7 @@ object TabForm_Main: TTabForm_Main
         Position.Y = 10.000000000000000000
         TabOrder = 2
         Text = 'Start'
+        OnClick = Button_Server_Start_OnClick
       end
       object GridPanelLayout_Server: TGridPanelLayout
         Anchors = [akLeft, akTop, akRight, akBottom]
@@ -425,8 +426,12 @@ object TabForm_Main: TTabForm_Main
     Top = 456
   end
   object TCPServer_Main: TIdTCPServer
+    OnStatus = TCPServer_Main_OnStatus
     Bindings = <>
     DefaultPort = 0
+    OnConnect = TCPServer_Main_OnConnect
+    OnDisconnect = TCPServer_Main_OnDisconnect
+    OnExecute = TCPServer_Main_OnExecute
     Left = 176
     Top = 512
   end
