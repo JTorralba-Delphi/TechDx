@@ -9,6 +9,7 @@ object TabForm_Main: TTabForm_Main
   FormFactor.Height = 900
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
+  OnClose = Quit
   DesignerMasterStyle = 0
   object ToolBar_Main: TToolBar
     Anchors = []
@@ -410,7 +411,6 @@ object TabForm_Main: TTabForm_Main
     OnDisconnected = TCPClient_Main_OnDisconnected
     OnConnected = TCPClient_Main_OnConnected
     ConnectTimeout = 0
-    IPVersion = Id_IPv4
     Port = 0
     ReadTimeout = -1
     Left = 176

@@ -10,7 +10,7 @@ uses
   FMX.Layouts, FMX.ListBox, IdBaseComponent, IdComponent, IdTCPConnection,
   IdTCPClient, FMX.ScrollBox, FMX.Memo, IDThreadComponent, IDGlobal, System.StrUtils,
   IDCustomTCPServer, IDTCPServer,
-  IDStack, IDContext;
+  IDStack, IDContext, FMX.Memo.Types;
 
 type
   TTabForm_Main = class(TForm)
@@ -74,6 +74,7 @@ type
     procedure TCPServer_Main_OnDisconnect(AContext: TIDContext);
     procedure TCPServer_Main_OnStatus(ASender: TObject; const AStatus: TIDStatus; const AStatusText: String);
     procedure Button_Server_Start_OnClick(Sender: TObject);
+    procedure Quit(Sender: TObject; var Action: TCloseAction);
 
   private
   public
@@ -153,9 +154,11 @@ begin
   Button_Client_Send.Enabled := True;
   Button_Client_Connect.Text := 'Disconnect';
   Memo_Client_Message.SetFocus();
-  Client_Log('ST', 'Connected to server.', TimeStamp, IP_Client, IP_Client);
+
   IP_Client := TCPClient_Main.Socket.Binding.IP;
   IP_Remote := TCPClient_Main.Socket.Binding.PeerIP;
+
+  Client_Log('ST', 'Connected to server ' + IP_Remote + '.', TimeStamp, IP_Remote, IP_Client);
 end;
 
 procedure TTabForm_Main.TCPClient_Main_OnDisconnected(Sender: TObject);
@@ -206,6 +209,10 @@ begin
 
   TCPClient_Main.IOHandler.ReadBytes(Bytes, -1);
   Message := BytesToString(Bytes,IndyTextEncoding_UTF8);
+
+  IP_Client := TCPClient_Main.Socket.Binding.IP;
+  IP_Remote := TCPClient_Main.Socket.Binding.PeerIP;
+
   Client_Log('RX', Message, TimeStamp, IP_Remote, IP_Client);
 end;
 
@@ -253,7 +260,30 @@ begin
   TCPClient_Main.Disconnect;
 end;
 
+procedure TTabForm_Main.Quit(Sender: TObject; var Action: TCloseAction);
+begin
+  try
+    TCPClient_Main.Disconnect;
+  except
+    on E: Exception do
+      begin
+        Client_Connected := False;
+        Client_Release(Sender);
+      end
+  end;
+  try
+    Server_Broadcast('Server initiated termination sequence.');
+    TCPServer_Main.Active := False;
+  except
+    on E: Exception do
+      begin
+        Server_Started := False;
+      end
+  end;
+end;
+
 procedure TTabForm_Main.Client_Log(Message_Type: String; Message: String; TimeStamp: String; IP_From: String; IP_To: String);
+var TCP_Flow : String;
 begin
   TThread.Queue(nil, procedure
     begin
@@ -267,13 +297,13 @@ begin
         Message := LeftStr(Message, Message.Length - 1);
       end;
 
-      Memo_Client_Console.Lines.Add('----------------------------------------------------------------------');
-      Memo_Client_Console.Lines.Add(TimeStamp + ' ' + Message_Type + ' ' + Message.Length.ToString() + ' Byte(s)');
-
-      if IP_From <> IP_To then
+      if (Message_Type <> 'ST') then
         begin
-          Memo_Client_Console.Lines.Add(IP_From + ' --> ' + IP_To);
+          TCP_Flow := IP_From + ' --> ' + IP_To;
         end;
+
+      Memo_Client_Console.Lines.Add(TimeStamp + ' ' + Message_Type + ' ' + Message.Length.ToString() + ' Byte(s) ' + TCP_Flow);
+      Memo_Client_Console.Lines.Add('--------------------------------------------------------------------------------');
 
       Memo_Client_Console.Lines.Add(Message + CRLF);
       Memo_Client_Console.SelStart := Memo_Client_Console.Lines.Text.Length - 1;
@@ -301,6 +331,7 @@ begin
 end;
 
 procedure TTabForm_Main.Server_Log(Message_Type: String; Message: String; TimeStamp: String; IP_From: String; IP_To: String);
+var TCP_Flow : String;
 begin
   TThread.Queue(nil, procedure
     begin
@@ -314,13 +345,13 @@ begin
         Message := LeftStr(Message, Message.Length - 1);
       end;
 
-      Memo_Server_Console.Lines.Add('----------------------------------------------------------------------');
-      Memo_Server_Console.Lines.Add(TimeStamp + ' ' + Message_Type + ' ' + Message.Length.ToString() + ' Byte(s)');
-
-      if IP_From <> IP_To then
+      if (Message_Type <> 'ST') then
         begin
-          Memo_Server_Console.Lines.Add(IP_From + ' --> ' + IP_To);
+          TCP_Flow := IP_From + ' --> ' + IP_To;
         end;
+
+      Memo_Server_Console.Lines.Add(TimeStamp + ' ' + Message_Type + ' ' + Message.Length.ToString() + ' Byte(s) ' + TCP_Flow);
+      Memo_Server_Console.Lines.Add('--------------------------------------------------------------------------------');
 
       Memo_Server_Console.Lines.Add(Message + CRLF);
       Memo_Server_Console.SelStart := Memo_Server_Console.Lines.Text.Length - 1;
@@ -386,7 +417,8 @@ var TimeStamp : String;
 begin
   TimeStamp := GetNow();
   Server_Log('ST', 'Client ' + AContext.Binding.PeerIP + ' connected.', TimeStamp, IP_Local, IP_Local);
-  Server_Broadcast('Hello ' + AContext.Binding.PeerIP + '!');
+  {Server_Broadcast('Hello ' + AContext.Binding.PeerIP + '!');}
+  AContext.Connection.IOHandler.WriteLn('Hello ' + AContext.Binding.PeerIP + '!');
 end;
 
 procedure TTabForm_Main.TCPServer_Main_OnDisconnect(AContext: TIdContext);
@@ -405,6 +437,13 @@ begin
   AContext.Connection.Socket.ReadBytes(Bytes, -1);
   Message := BytesToString(Bytes,IndyTextEncoding_UTF8);
   Server_Log('RX', Message, TimeStamp, AContext.Binding.PeerIP, IP_Local);
+
+  if (RadioButton_Server_Echo.IsChecked)
+    then
+    begin
+      Server_Broadcast(Message);
+    end;
+
 end;
 
 procedure TTabForm_Main.TCPServer_Main_OnStatus(ASender: TObject; const AStatus: TIdStatus; const AStatusText: String);
@@ -416,10 +455,10 @@ end;
 
 procedure TTabForm_Main.Server_Broadcast(Message: String);
 var
-    TempList      : TList;
+    TempList     : TList;
     ContexClient : TIDContext;
-    NClients     : Integer;
     I            : Integer;
+    TimeStamp    : String;
 begin
     TempList  := TCPServer_Main.Contexts.LockList;
 
@@ -429,6 +468,8 @@ begin
           begin
             ContexClient := TempList[I];
             ContexClient.Connection.IOHandler.WriteLn(Message);
+            TimeStamp := GetNow();
+            Server_Log('TX', Message, TimeStamp, IP_Local, ContexClient.Binding.PeerIP);
             I := I + 1;
         end;
     finally
