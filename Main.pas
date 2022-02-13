@@ -43,8 +43,8 @@ type
     Memo_Server_Console: TMemo;
     Memo_Server_Message: TMemo;
     RadioButton_Server_Echo: TRadioButton;
-    RadioButton_Server_Proxy: TRadioButton;
-    RadioButton_Server_Interactive: TRadioButton;
+    RadioButton_Server_Reverse: TRadioButton;
+    RadioButton_Server_Normal: TRadioButton;
     Button_Server_Send: TButton;
 
     TabItem_ANIALI: TTabItem;
@@ -74,6 +74,7 @@ type
     procedure TCPServer_Main_OnDisconnect(AContext: TIDContext);
     procedure TCPServer_Main_OnStatus(ASender: TObject; const AStatus: TIDStatus; const AStatusText: String);
     procedure Button_Server_Start_OnClick(Sender: TObject);
+    procedure Button_Server_Send_OnClick(Sender: TObject);
     procedure Quit(Sender: TObject; var Action: TCloseAction);
 
   private
@@ -118,7 +119,7 @@ end;
 
 function TTabForm_Main.GetNow(): String;
 begin
-    result := FormatDateTime('yyyy-mm-dd hh:nn:ss', Now);
+    result := FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now);
 end;
 
 function TTabForm_Main.Get_Local_IP() : String;
@@ -194,7 +195,6 @@ var Bytes : TIDBytes;
 var Message : String;
 
 begin
-  TimeStamp := GetNow();
   if TCPClient_Main.IOHandler.InputBufferIsEmpty
   then
     begin
@@ -208,6 +208,7 @@ begin
     end;
 
   TCPClient_Main.IOHandler.ReadBytes(Bytes, -1);
+  TimeStamp := GetNow();
   Message := BytesToString(Bytes,IndyTextEncoding_UTF8);
 
   IP_Client := TCPClient_Main.Socket.Binding.IP;
@@ -316,7 +317,7 @@ var TimeStamp : String;
 begin
   TimeStamp := GetNow();
   try
-    TCPClient_Main.Socket.WriteLn(Memo_Client_Message.Text);
+    TCPClient_Main.Socket.Write(Memo_Client_Message.Text);
     Client_Log('TX' , Memo_Client_Message.Text, TimeStamp, IP_Client, IP_Remote);
     Memo_Client_Message.Lines.Clear();
   except
@@ -375,8 +376,8 @@ begin
 
         Memo_Server_Message.Enabled := True;
         RadioButton_Server_Echo.Enabled := True;
-        RadioButton_Server_Proxy.Enabled := True;
-        RadioButton_Server_Interactive.Enabled := True;
+        RadioButton_Server_Reverse.Enabled := True;
+        RadioButton_Server_Normal.Enabled := True;
         Button_Server_Send.Enabled := True;
         Button_Server_Start.Text := 'Stop';
         Memo_Server_Message.SetFocus();
@@ -403,8 +404,8 @@ begin
       end;
         Memo_Server_Message.Enabled := False;
         RadioButton_Server_Echo.Enabled := False;
-        RadioButton_Server_Proxy.Enabled := False;
-        RadioButton_Server_Interactive.Enabled := False;
+        RadioButton_Server_Reverse.Enabled := False;
+        RadioButton_Server_Normal.Enabled := False;
         Button_Server_Send.Enabled := False;
         Button_Server_Start.Text := 'Start';
         Button_Server_Start.SetFocus();
@@ -417,8 +418,7 @@ var TimeStamp : String;
 begin
   TimeStamp := GetNow();
   Server_Log('ST', 'Client ' + AContext.Binding.PeerIP + ' connected.', TimeStamp, IP_Local, IP_Local);
-  {Server_Broadcast('Hello ' + AContext.Binding.PeerIP + '!');}
-  AContext.Connection.IOHandler.WriteLn('Hello ' + AContext.Binding.PeerIP + '!');
+  AContext.Connection.IOHandler.Write('Hello ' + AContext.Binding.PeerIP + '!');
 end;
 
 procedure TTabForm_Main.TCPServer_Main_OnDisconnect(AContext: TIdContext);
@@ -429,21 +429,30 @@ begin
 end;
 
 procedure TTabForm_Main.TCPServer_Main_OnExecute(AContext: TIDContext);
-var TimeStamp : String;
+var TimeStampRX, TimeStampTX : String;
 var Bytes : TIDBytes;
 var Message : String;
 begin
-  TimeStamp := GetNow();
   AContext.Connection.Socket.ReadBytes(Bytes, -1);
+  TimeStampRX := GetNow();
   Message := BytesToString(Bytes,IndyTextEncoding_UTF8);
-  Server_Log('RX', Message, TimeStamp, AContext.Binding.PeerIP, IP_Local);
+  Server_Log('RX', Message, TimeStampRX, AContext.Binding.PeerIP, IP_Local);
 
   if (RadioButton_Server_Echo.IsChecked)
     then
     begin
-      Server_Broadcast(Message);
+      TimeStampTX := GetNow();
+      AContext.Connection.IOHandler.Write(Message);
+      Server_Log('TX', Message, TimeStampTX, IP_LOcal, AContext.Binding.PeerIP);
     end;
 
+    if (RadioButton_Server_Reverse.IsChecked)
+    then
+    begin
+      TimeStampTX := GetNow();
+      AContext.Connection.IOHandler.Write(ReverseString(Message));
+      Server_Log('TX', ReverseString(Message), TimeStampTX, IP_LOcal, AContext.Binding.PeerIP);
+    end;
 end;
 
 procedure TTabForm_Main.TCPServer_Main_OnStatus(ASender: TObject; const AStatus: TIdStatus; const AStatusText: String);
@@ -467,8 +476,8 @@ begin
         while ( i < TempList.Count ) do
           begin
             ContexClient := TempList[I];
-            ContexClient.Connection.IOHandler.WriteLn(Message);
             TimeStamp := GetNow();
+            ContexClient.Connection.IOHandler.Write(Message);
             Server_Log('TX', Message, TimeStamp, IP_Local, ContexClient.Binding.PeerIP);
             I := I + 1;
         end;
@@ -477,4 +486,19 @@ begin
     end;
 end;
 
+procedure TTabForm_Main.Button_Server_Send_OnClick(Sender: TObject);
+var TimeStamp : String;
+begin
+  TimeStamp := GetNow();
+  try
+    Server_Broadcast(Memo_Server_Message.Text);
+    Memo_Server_Message.Lines.Clear();
+  except
+    on E: Exception do
+      begin
+        Server_Log('ST', '** Send_Exception **' + CRLF + E.Message, TimeStamp, IP_Local, IP_Local);
+      end
+  end;
+  Memo_Server_Message.SetFocus();
+end;
 end.

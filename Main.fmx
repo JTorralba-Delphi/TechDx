@@ -282,11 +282,10 @@ object TabForm_Main: TTabForm_Main
         Size.PlatformDefault = False
         TabOrder = 7
         Text = 'Send'
-        OnClick = Button_Client_Send_OnClick
+        OnClick = Button_Server_Send_OnClick
       end
       object RadioButton_Server_Echo: TRadioButton
         Anchors = [akLeft, akBottom]
-        IsChecked = True
         Position.X = 8.000000000000000000
         Position.Y = 440.000000000000000000
         Size.Width = 80.000000000000000000
@@ -295,25 +294,26 @@ object TabForm_Main: TTabForm_Main
         TabOrder = 4
         Text = 'Echo'
       end
-      object RadioButton_Server_Proxy: TRadioButton
+      object RadioButton_Server_Reverse: TRadioButton
         Anchors = [akLeft, akBottom]
-        Position.X = 84.000000000000000000
+        Position.X = 77.000000000000000000
         Position.Y = 440.000000000000000000
         Size.Width = 80.000000000000000000
         Size.Height = 19.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 5
-        Text = 'Proxy'
+        Text = 'Reverse'
       end
-      object RadioButton_Server_Interactive: TRadioButton
+      object RadioButton_Server_Normal: TRadioButton
         Anchors = [akLeft, akBottom]
+        IsChecked = True
         Position.X = 160.000000000000000000
         Position.Y = 440.000000000000000000
         Size.Width = 80.000000000000000000
         Size.Height = 19.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 6
-        Text = 'Interactive'
+        Text = 'Normal'
       end
     end
     object TabItem_ANIALI: TTabItem
